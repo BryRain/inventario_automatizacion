@@ -57,9 +57,9 @@ Diagrama del proceso actual frente al automatizado: [Evidencias/Diagrama.Inventa
 
 | Workflow | Archivo | Responsabilidad |
 | --- | --- | --- |
-| **Principal** | [`workflows/Inventario_productos_Tally_Webhook_baserow_con_subworkflow.json`](workflows/Inventario_productos_Tally_Webhook_baserow_con_subworkflow.json) | Recibe las dos entradas (revisión programada y alta por Tally), lee y escribe en Sheets y Baserow, llama al subworkflow, controla duplicados, registra la alerta y envía el correo |
-| **Subworkflow** `Preparar Alerta Reposicion` | [`workflows/Subworkflow_Preparar_Alerta_Reposicion.json`](workflows/Subworkflow_Preparar_Alerta_Reposicion.json) | Valida, normaliza, clasifica por categoría y redacta la alerta (`preparada` o `invalida`). No usa servicios externos |
-| **Errores** | [`workflows/Workflow_Errores_Inventario.json`](workflows/Workflow_Errores_Inventario.json) | `Error Trigger`: cuando falla el principal, registra el fallo en Baserow y avisa por correo |
+| **Principal** | [`workflows/Inventario_productos_Tally_Webhook_baserow_con_subworkflow.json`](workflows/Inventario_productos_Tally_Webhook_baserow_con_subworkflows.json) | Recibe las dos entradas (revisión programada y alta por Tally), lee y escribe en Sheets y Baserow, llama al subworkflow, controla duplicados, registra la alerta y envía el correo |
+| **Subworkflow** `Preparar Alerta Reposicion` | [`workflows/Subworkflow_Preparar_Alerta_Reposicion.json`](workflows/Subworkflow%-%Preparar%Alerta%de%Reposicion.json) | Valida, normaliza, clasifica por categoría y redacta la alerta (`preparada` o `invalida`). No usa servicios externos |
+| **Errores** | [`workflows/Workflow_Errores_Inventario.json`](workflows/Workflow%de%Errores%-%Inventario.json) | `Error Trigger`: cuando falla el principal, registra el fallo en Baserow y avisa por correo |
 
 Un **subworkflow** es un workflow que otro workflow llama como si fuera un solo paso; aquí concentra las reglas de la alerta para que el principal quede ordenado.
 
@@ -185,10 +185,10 @@ se espera que pasen el filtro 5 productos (3 de `cantidad <= stock_minimo` en pe
 | Documento | Contenido |
 | --- | --- |
 | [Bitácora unificada](Bitacora_Unificada_Proyecto.md) | Documentación completa: alcance, reglas, integraciones, errores, pruebas y estado final |
-| [Presentación en PDF](docs/WilliamRodriguez_KevinRengifo_BryanBenavides_MichaelMenotti_Electiva4.pdf) | Resumen del proyecto para quien no conoce n8n |
-| [Diagrama proceso actual vs automatizado](Evidencias/Diagrama.Inventario.drawio.png) | Comparación visual del proceso |
-| [Índice de evidencias y pruebas](Bitacora_Unificada_Proyecto.md#63-índice-de-evidencias-disponibles) | Capturas en [`Evidencias/`](evidencias/) y la prueba a la que corresponde cada una |
-| [Historial de bitácoras C02–C08](historial_bitacoras/) | Bitácoras por clase, conservadas como historial |
+| [Presentación en PDF](documentacion/presentacion_proyecto_2do_corte.pdf) | Resumen del proyecto para quien no conoce n8n |
+| [Diagrama proceso actual vs automatizado](documentacion/diagramas/diagrama_automatizacion.png) | Comparación visual del proceso |
+| [Índice de evidencias y pruebas](Bitacora_Unificada_Proyecto.md#63-índice-de-evidencias-disponibles) | Capturas en [`evidencias/`](evidencias/) y la prueba a la que corresponde cada una |
+
 
 video de demostracion: 
 
