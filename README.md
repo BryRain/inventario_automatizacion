@@ -187,7 +187,7 @@ se espera que pasen el filtro 5 productos (3 de `cantidad <= stock_minimo` en pe
 | [Bitácora unificada](Bitacora_Unificada_Proyecto.md) | Documentación completa: alcance, reglas, integraciones, errores, pruebas y estado final |
 | [Presentación en PDF](docs/WilliamRodriguez_KevinRengifo_BryanBenavides_MichaelMenotti_Electiva4.pdf) | Resumen del proyecto para quien no conoce n8n |
 | [Diagrama proceso actual vs automatizado](Evidencias/Diagrama.Inventario.drawio.png) | Comparación visual del proceso |
-| [Índice de evidencias y pruebas](Bitacora_Unificada_Proyecto.md#63-índice-de-evidencias-disponibles) | Capturas en [`Evidencias/`](Evidencias/) y la prueba a la que corresponde cada una |
+| [Índice de evidencias y pruebas](Bitacora_Unificada_Proyecto.md#63-índice-de-evidencias-disponibles) | Capturas en [`Evidencias/`](evidencias/) y la prueba a la que corresponde cada una |
 | [Historial de bitácoras C02–C08](historial_bitacoras/) | Bitácoras por clase, conservadas como historial |
 
 
