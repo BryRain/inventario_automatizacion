@@ -184,10 +184,10 @@ se espera que pasen el filtro 5 productos (3 de `cantidad <= stock_minimo` en pe
 
 | Documento | Contenido |
 | --- | --- |
-| [Bitácora unificada](Bitacora_Unificada_Proyecto.md) | Documentación completa: alcance, reglas, integraciones, errores, pruebas y estado final |
+| [Bitácora unificada](documentacion/Bitacora_Unificada_Proyecto.md) | Documentación completa: alcance, reglas, integraciones, errores, pruebas y estado final |
 | [Presentación en PDF](documentacion/presentacion_proyecto_2do_corte.pdf) | Resumen del proyecto para quien no conoce n8n |
 | [Diagrama proceso actual vs automatizado](documentacion/diagramas/diagrama_automatizacion.png) | Comparación visual del proceso |
-| [Índice de evidencias y pruebas](Bitacora_Unificada_Proyecto.md#63-índice-de-evidencias-disponibles) | Capturas en [`evidencias/`](evidencias/) y la prueba a la que corresponde cada una |
+| [Índice de evidencias y pruebas](documentacion/) | Capturas en [`evidencias/`](/documentacion/evidencias/) y la prueba a la que corresponde cada una |
 
 
 video de demostracion: 
