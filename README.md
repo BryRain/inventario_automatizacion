@@ -58,7 +58,7 @@ Diagrama del proceso actual frente al automatizado: [Evidencias/Diagrama.Inventa
 | Workflow | Archivo | Responsabilidad |
 | --- | --- | --- |
 | **Principal** | [`workflows/Inventario_productos_Tally_Webhook_baserow_con_subworkflow.json`](workflows/Inventario_productos_Tally_Webhook_baserow_con_subworkflows.json) | Recibe las dos entradas (revisión programada y alta por Tally), lee y escribe en Sheets y Baserow, llama al subworkflow, controla duplicados, registra la alerta y envía el correo |
-| **Subworkflow** `Preparar Alerta Reposicion` | [Ver el archivo Subworkflow](<Subworkflow - Preparar Alerta de Reposicion.json>)(workflows/Subworkflow - Preparar Alerta de Reposicion.json) | Valida, normaliza, clasifica por categoría y redacta la alerta (`preparada` o `invalida`). No usa servicios externos |
+| **Subworkflow** `Preparar Alerta Reposicion` | [Ver el archivo Subworkflow](<Subworkflow - Preparar Alerta de Reposicion.json>) | Valida, normaliza, clasifica por categoría y redacta la alerta (`preparada` o `invalida`). No usa servicios externos |
 | **Errores** | [Workflow de Errores - Inventario](<workflows/Workflow de Errores - Inventario.json>) | `Error Trigger`: cuando falla el principal, registra el fallo en Baserow y avisa por correo |
 
 Un **subworkflow** es un workflow que otro workflow llama como si fuera un solo paso; aquí concentra las reglas de la alerta para que el principal quede ordenado.
