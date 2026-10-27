@@ -190,4 +190,13 @@ se espera que pasen el filtro 5 productos (3 de `cantidad <= stock_minimo` en pe
 | [Índice de evidencias y pruebas](Bitacora_Unificada_Proyecto.md#63-índice-de-evidencias-disponibles) | Capturas en [`Evidencias/`](evidencias/) y la prueba a la que corresponde cada una |
 | [Historial de bitácoras C02–C08](historial_bitacoras/) | Bitácoras por clase, conservadas como historial |
 
+video de demostracion: 
+
+
+
+https://github.com/user-attachments/assets/2dc45469-9607-459b-aa2b-45d83cb3b304
+
+
+
+
 
