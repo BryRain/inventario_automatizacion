@@ -1,0 +1,472 @@
+{
+  "name": "Subworkflow - Preparar Alerta de Reposicion",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1616,
+        624
+      ],
+      "id": "1c8f0261-1e89-4e2c-84c3-64360b8d3675",
+      "name": "Recibir datos de alerta"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const d = $input.item.json;\n\nconst texto = (v) => String(v ?? '').trim();\nconst esNumeroValido = (v) => texto(v) !== '' && Number.isFinite(Number(v)) && Number(v) >= 0;\n\nconst motivos = [];\nif (!texto(d.producto)) motivos.push('falta el producto');\nif (!texto(d.categoria)) motivos.push('falta la categoria');\nif (!esNumeroValido(d.cantidad)) motivos.push('cantidad vacia, no numerica o negativa');\nif (!esNumeroValido(d.stock_minimo)) motivos.push('stock minimo vacio, no numerico o negativo');\n\nreturn { json: { ...d, valido: motivos.length === 0, motivo: motivos.join('; ') } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1392,
+        624
+      ],
+      "id": "51260a8e-ada3-46a3-81ea-03822970b924",
+      "name": "Validar datos de stock"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a1000000-0000-4000-8000-0000000000a1",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1168,
+        624
+      ],
+      "id": "787d2918-aa42-4b7b-a879-7e4a10199204",
+      "name": "¿Datos validos?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1000000-0000-4000-8000-0000000000b1",
+              "name": "estado",
+              "value": "invalida",
+              "type": "string"
+            },
+            {
+              "id": "a1000000-0000-4000-8000-0000000000b2",
+              "name": "motivo",
+              "value": "={{ $json.motivo }}",
+              "type": "string"
+            },
+            {
+              "id": "a1000000-0000-4000-8000-0000000000b3",
+              "name": "producto",
+              "value": "={{ $json.producto ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a1000000-0000-4000-8000-0000000000b4",
+              "name": "fila_hoja",
+              "value": "={{ $json.fila_hoja || 'N/A' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -928,
+        800
+      ],
+      "id": "8dc12f0b-764b-4586-baca-aed4640217a7",
+      "name": "Marcar entrada invalida"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -16,
+        624
+      ],
+      "id": "d1adab84-161b-4827-8f32-0d6627991409",
+      "name": "Unir resultados"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2ac6ba56-ffeb-478a-9d51-84394cca95c7",
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "Perifericos",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Perifericos"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6c973ed5-220f-405c-8340-6391c0a55b16",
+                    "leftValue": "={{ $json.categoria }}",
+                    "rightValue": "Monitores",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Monitores"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Otras categorias (Componentes, etc.)"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -928,
+        528
+      ],
+      "id": "19950ee9-3e40-4824-814f-27a1245dae65",
+      "name": "Clasificar por Categoria1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "778b9fc0-5927-4a02-aa3d-88c75ca30f01",
+              "name": "alerta",
+              "value": "={{ 'El periferico ' + $json.producto + ' tiene el stock menor al minimo. Cantidad: ' + $json.cantidad }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -688,
+        400
+      ],
+      "id": "767c9989-31c0-435c-9e85-6a0dca2cb4f8",
+      "name": "Alerta Perifericos1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "778b9fc0-5927-4a02-aa3d-88c75ca30f01",
+              "name": "alerta",
+              "value": "={{ 'El monitor ' + $json.producto + ' tiene el stock menor al minimo. Cantidad: ' + $json.cantidad }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -688,
+        528
+      ],
+      "id": "ec1bf794-2880-43f3-b4e6-a65ca16ee228",
+      "name": "Alerta Monitores1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "778b9fc0-5927-4a02-aa3d-88c75ca30f01",
+              "name": "alerta",
+              "value": "={{ 'El producto ' + $json.producto + ' tiene el stock menor al minimo. Cantidad: ' + $json.cantidad }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -688,
+        656
+      ],
+      "id": "ed8b030a-a9df-400e-931f-62267b328d55",
+      "name": "Alerta Otras Categorias1"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -464,
+        528
+      ],
+      "id": "661b70ab-e96b-4e0e-8b8c-ac05200e541e",
+      "name": "Merge Alertas1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1c2d3e4-0001-4a00-9000-000000000010",
+              "name": "producto_normalizado",
+              "value": "={{ $json.producto.trim().toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "b1c2d3e4-0002-4a00-9000-000000000011",
+              "name": "ticket",
+              "value": "={{ $json.categoria.trim().toLowerCase() + '-' + $json.producto.trim().toLowerCase() + '-' + Date.now() }}",
+              "type": "string"
+            },
+            {
+              "id": "b1c2d3e4-0003-4a00-9000-000000000012",
+              "name": "asunto",
+              "value": "={{ 'Reposicion urgente: ' + $json.producto.trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "b1c2d3e4-0004-4a00-9000-000000000013",
+              "name": "cuerpo",
+              "value": "={{ $json.alerta }}",
+              "type": "string"
+            },
+            {
+              "id": "b1c2d3e4-0005-4a00-9000-000000000014",
+              "name": "fila_hoja",
+              "value": "={{ $json.fila_hoja || 'N/A' }}",
+              "type": "string"
+            },
+            {
+              "id": "b1c2d3e4-0006-4a00-9000-000000000015",
+              "name": "estado",
+              "value": "preparada",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -240,
+        528
+      ],
+      "id": "f484349b-affa-4722-b70d-75bad3cb3291",
+      "name": "Mapeo y Salida1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Recibir datos de alerta": {
+      "main": [
+        [
+          {
+            "node": "Validar datos de stock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar datos de stock": {
+      "main": [
+        [
+          {
+            "node": "¿Datos validos?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Datos validos?": {
+      "main": [
+        [
+          {
+            "node": "Clasificar por Categoria1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Marcar entrada invalida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar entrada invalida": {
+      "main": [
+        [
+          {
+            "node": "Unir resultados",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Clasificar por Categoria1": {
+      "main": [
+        [
+          {
+            "node": "Alerta Perifericos1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alerta Monitores1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alerta Otras Categorias1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alerta Perifericos1": {
+      "main": [
+        [
+          {
+            "node": "Merge Alertas1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alerta Monitores1": {
+      "main": [
+        [
+          {
+            "node": "Merge Alertas1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Alerta Otras Categorias1": {
+      "main": [
+        [
+          {
+            "node": "Merge Alertas1",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge Alertas1": {
+      "main": [
+        [
+          {
+            "node": "Mapeo y Salida1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mapeo y Salida1": {
+      "main": [
+        [
+          {
+            "node": "Unir resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "cbaedc97-3448-4ba8-a473-088540f3a1d2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2c378de5eb366ba75f6de33479a2e02fd19f346d6ec51b9d139c7b0b79b5a3c8"
+  },
+  "nodeGroups": [],
+  "id": "jK2F3qpPDw97wMjg",
+  "tags": []
+}

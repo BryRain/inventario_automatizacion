@@ -1,0 +1,128 @@
+{
+  "name": "Workflow de Errores - Inventario",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        -48
+      ],
+      "id": "0b8bb196-a013-451f-a68f-783c5854b6e3",
+      "name": "Error Trigger",
+      "notes": "Se activa automaticamente cuando falla un nodo en el workflow principal (NO se activa en ejecuciones manuales). Recibe: execution.id, execution.url, error.message, error.node.name, workflow.id, workflow.name."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const err = $input.item.json;\n\nconst workflowNombre = err.workflow?.name ?? 'Desconocido';\nconst workflowId     = err.workflow?.id   ?? '';\nconst execId         = err.execution?.id  ?? '';\nconst execUrl        = err.execution?.url ?? '';\nconst nodoNombre     = err.error?.node?.name ?? 'Nodo desconocido';\nconst mensajeError   = err.error?.message    ?? 'Sin mensaje';\nconst tipoError      = err.error?.name       ?? 'Error';\n\nconst ahora = new Date();\nconst opciones = { timeZone: 'America/Bogota', hour12: false,\n  year: 'numeric', month: '2-digit', day: '2-digit',\n  hour: '2-digit', minute: '2-digit', second: '2-digit' };\nconst fechaHora = new Intl.DateTimeFormat('es-CO', opciones).format(ahora);\n\n\nconst asunto = `[ERROR INVENTARIO] ${nodoNombre} — ${workflowNombre}`;\n\nconst cuerpoHtml = `\n<div style=\"font-family:Arial,sans-serif;padding:20px;border:2px solid #d9534f;border-radius:8px;max-width:600px;\">\n  <h2 style=\"color:#d9534f;margin-top:0;\">⛔ Error en el flujo de inventario</h2>\n  <table style=\"border-collapse:collapse;width:100%;\">\n    <tr><td style=\"padding:6px 8px;font-weight:bold;width:160px;\">Fecha (Bogotá)</td><td style=\"padding:6px 8px;\">${fechaHora}</td></tr>\n    <tr style=\"background:#f9f9f9;\"><td style=\"padding:6px 8px;font-weight:bold;\">Workflow</td><td style=\"padding:6px 8px;\">${workflowNombre} (${workflowId})</td></tr>\n    <tr><td style=\"padding:6px 8px;font-weight:bold;\">Nodo que falló</td><td style=\"padding:6px 8px;\">${nodoNombre}</td></tr>\n    <tr style=\"background:#f9f9f9;\"><td style=\"padding:6px 8px;font-weight:bold;\">Tipo de error</td><td style=\"padding:6px 8px;\">${tipoError}</td></tr>\n    <tr><td style=\"padding:6px 8px;font-weight:bold;\">Mensaje</td><td style=\"padding:6px 8px;color:#c0392b;\">${mensajeError}</td></tr>\n    <tr style=\"background:#f9f9f9;\"><td style=\"padding:6px 8px;font-weight:bold;\">ID ejecución</td><td style=\"padding:6px 8px;\">${execId}</td></tr>\n  </table>\n  ${execUrl ? `<p style=\"margin-top:16px;\"><a href=\"${execUrl}\" style=\"color:#3498db;\">Ver ejecución en n8n →</a></p>` : ''}\n  <p style=\"font-size:11px;color:#888;margin-bottom:0;\">Generado automáticamente por el workflow de errores del inventario.</p>\n</div>`;\n\nreturn { json: {\n  fecha_hora: fechaHora,\n  workflow_nombre: workflowNombre,\n  workflow_id: workflowId,\n  exec_id: execId,\n  exec_url: execUrl,\n  nodo: nodoNombre,\n  tipo_error: tipoError,\n  mensaje_error: mensajeError,\n  asunto,\n  cuerpo_html: cuerpoHtml\n} };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -496,
+        -48
+      ],
+      "id": "22a91e13-9f6d-4638-8fb3-7882bf3488d5",
+      "name": "Preparar datos del error",
+      "notes": "Extrae y formatea los datos del error: timestamp, workflow, nodo, tipo, mensaje, URL de ejecucion. Construye el asunto y el cuerpo HTML para enviarlo al correo electronicos"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.baserow.io/api/database/rows/table/1227756/?user_field_names=true",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "baserowTokenApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ Nombre: 'ERROR: ' + $json.nodo, Nota: $json.mensaje_error + ' | ' + $json.fecha_hora + ' | Exec: ' + $json.exec_id }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -256,
+        -128
+      ],
+      "id": "6d289c55-3a85-4d33-81c5-eb99ba7c7790",
+      "name": "Registrar error en Baserow",
+      "credentials": {
+        "baserowTokenApi": {
+          "id": "algkwZNXtFTT7iRg",
+          "name": "Baserow Token account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "=benavidesbryan403@gmail.com",
+        "subject": "={{ $json.asunto }}",
+        "message": "={{ $json.cuerpo_html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        64
+      ],
+      "id": "b538ee6f-e4f6-4a43-93e5-bd0be08aad96",
+      "name": "Notificar error por correo",
+      "webhookId": "err-webhook-0000-0000-000000000004",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ddXOzRk4GtHcrMlm",
+          "name": "Gmail account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Preparar datos del error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar datos del error": {
+      "main": [
+        [
+          {
+            "node": "Registrar error en Baserow",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notificar error por correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3dc4227c-f569-4f0a-91d5-0d38152f8b46",
+  "meta": {
+    "instanceId": "2c378de5eb366ba75f6de33479a2e02fd19f346d6ec51b9d139c7b0b79b5a3c8"
+  },
+  "nodeGroups": [],
+  "id": "MsPfrCqIBh7hPGrZ",
+  "tags": []
+}
